@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key}); // ✅ FIXED
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchNews() async {
     setState(() => loading = true);
 
-    const apiKey = "ec1c17aaa71243b9b788486ed7715f49"; // 👈 Api Key
+    const apiKey = "ec1c17aaa71243b9b788486ed7715f49"; // 👈 API Key
     final url = Uri.parse(
       "https://newsapi.org/v2/top-headlines?country=us&category=$selectedCategory&apiKey=$apiKey",
     );
@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } else {
       debugPrint("Error: ${res.statusCode}");
+      setState(() => loading = false);
     }
   }
 
@@ -87,8 +88,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     fetchNews();
                   },
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: isSelected ? Colors.blue : Colors.grey[300],
                       borderRadius: BorderRadius.circular(20),
@@ -126,10 +129,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                     article['urlToImage'],
                                     width: 80,
                                     fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(
+                                      Icons.broken_image,
+                                      size: 50,
+                                      color: Colors.grey,
+                                    ),
                                   )
-                                : Container(width: 80, color: Colors.grey),
-                            title: Text(article['title'] ?? "No Title"),
-                            subtitle: Text(article['description'] ?? "No Description"),
+                                : const Icon(
+                                    Icons.image_not_supported,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
+                            title: Text(
+                              article['title'] ?? "No Title",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              article['description'] ?? "No Description",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             onTap: () => _openUrl(article['url']),
                           ),
                         );
