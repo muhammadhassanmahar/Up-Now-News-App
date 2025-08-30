@@ -1,42 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/splash_screen.dart';
 
-void main() {
-  runApp(const UpNowApp());
+Future<void> main() async {
+  // ✅ Load env variables
+  await dotenv.load(fileName: ".env");
+  runApp(const MyApp());
 }
 
-class UpNowApp extends StatefulWidget {
-  const UpNowApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
   @override
-  State<UpNowApp> createState() => _UpNowAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
-class _UpNowAppState extends State<UpNowApp> {
-  ThemeMode _themeMode = ThemeMode.system; // default system theme
-
-  void _toggleTheme(bool isDark) {
-    setState(() {
-      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    });
-  }
+class _MyAppState extends State<MyApp> {
+  bool isDark = false; // ✅ default light theme
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'UpNow',
+      debugShowCheckedModeBanner: false,
+      title: "UpNow News",
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
       ),
       darkTheme: ThemeData(
-        brightness: Brightness.dark,
         primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+        ),
       ),
-      themeMode: _themeMode,
-      debugShowCheckedModeBanner: false,
       home: SplashScreen(
-        onThemeChanged: _toggleTheme, // 🔥 Pass toggle function to Splash/Home
+        onThemeChanged: (val) {
+          setState(() => isDark = val);
+        },
       ),
     );
   }
