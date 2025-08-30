@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key}); // ✅ super.key use kiya
+  final Function(bool)? onThemeChanged; // 🔥 Theme toggle callback
+
+  const SplashScreen({super.key, this.onThemeChanged}); // ✅ super.key use kiya
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -19,7 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomeScreen(), // ✅ const lagaya
+          builder: (context) => HomeScreen(
+            onThemeChanged: widget.onThemeChanged, // 🔥 pass kar diya
+          ),
         ),
       );
     });
@@ -27,9 +31,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold( // ✅ const lagaya kyunki andar sab const hai
-      backgroundColor: Colors.blue, // Background color
-      body: Center(
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor, // ✅ Theme-based bg
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
