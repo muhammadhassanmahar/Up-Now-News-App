@@ -3,8 +3,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/splash_screen.dart';
 
 Future<void> main() async {
-  // ✅ Load env variables
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Load environment variables from .env
   await dotenv.load(fileName: ".env");
+
   runApp(const MyApp());
 }
 
@@ -16,14 +19,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isDark = false; // ✅ default light theme
+  bool isDark = false; // ✅ Default Light Theme
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "UpNow News",
+
+      // ✅ Theme toggle
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+
+      // 🌞 Light Theme
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
@@ -33,6 +40,8 @@ class _MyAppState extends State<MyApp> {
           foregroundColor: Colors.white,
         ),
       ),
+
+      // 🌙 Dark Theme
       darkTheme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.dark,
@@ -42,6 +51,8 @@ class _MyAppState extends State<MyApp> {
           foregroundColor: Colors.white,
         ),
       ),
+
+      // ✅ Splash Screen → HomeScreen (with theme toggle support)
       home: SplashScreen(
         onThemeChanged: (val) {
           setState(() => isDark = val);
