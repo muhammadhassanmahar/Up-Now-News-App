@@ -5,8 +5,21 @@ void main() {
   runApp(const UpNowApp());
 }
 
-class UpNowApp extends StatelessWidget {
-  const UpNowApp({super.key}); // ✅ super.key use kiya
+class UpNowApp extends StatefulWidget {
+  const UpNowApp({super.key});
+
+  @override
+  State<UpNowApp> createState() => _UpNowAppState();
+}
+
+class _UpNowAppState extends State<UpNowApp> {
+  ThemeMode _themeMode = ThemeMode.system; // default system theme
+
+  void _toggleTheme(bool isDark) {
+    setState(() {
+      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +27,17 @@ class UpNowApp extends StatelessWidget {
       title: 'UpNow',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        brightness: Brightness.light,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.blue,
+      ),
+      themeMode: _themeMode,
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(), // sabse pehle splash screen khulegi
+      home: SplashScreen(
+        onThemeChanged: _toggleTheme, // 🔥 Pass toggle function to Splash/Home
+      ),
     );
   }
 }
