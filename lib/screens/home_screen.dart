@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: ListTile(
                             leading: article['urlToImage'] != null
                                 ? FadeInImage.assetNetwork(
-                                    placeholder: 'assets/placeholder.png',
+                                    placeholder: 'assets/placeholder.Jpeg',
                                     image: article['urlToImage'],
                                     width: 80,
                                     fit: BoxFit.cover,
