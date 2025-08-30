@@ -4,12 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'news_detail_screen.dart'; // ✅ new detail page
-
 class HomeScreen extends StatefulWidget {
-  final Function(bool)? onThemeChanged; // 🔥 theme toggle
-
-  const HomeScreen({super.key, this.onThemeChanged});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -17,11 +13,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List articles = [];
-  List filteredArticles = []; // ✅ for search
   bool loading = true;
   String selectedCategory = "general"; // Default category
-  bool isDark = false; // ✅ theme toggle
-  String searchQuery = "";
 
   final List<String> categories = [
     "general",
@@ -42,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchNews() async {
     setState(() => loading = true);
 
-    final apiKey = dotenv.env['NEWS_API_KEY'];
+    final apiKey = dotenv.env['NEWS_API_KEY']; // 🔒 Secure from .env
     final url = Uri.parse(
       "https://newsapi.org/v2/top-headlines?country=us&category=$selectedCategory&apiKey=$apiKey",
     );
@@ -54,7 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
         final data = jsonDecode(res.body);
         setState(() {
           articles = data['articles'] ?? [];
-          filteredArticles = articles; // ✅ reset filtered list
           loading = false;
         });
       } else {
@@ -65,23 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _showSnackBar("Something went wrong!");
       setState(() => loading = false);
     }
-  }
-
-  void _searchNews(String query) {
-    setState(() {
-      searchQuery = query;
-      if (query.isEmpty) {
-        filteredArticles = articles;
-      } else {
-        filteredArticles = articles
-            .where((a) =>
-                (a['title'] ?? "").toLowerCase().contains(query.toLowerCase()) ||
-                (a['description'] ?? "")
-                    .toLowerCase()
-                    .contains(query.toLowerCase()))
-            .toList();
-      }
-    });
   }
 
   Future<void> _openUrl(String? url) async {
@@ -107,39 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: searchQuery.isEmpty
-            ? const Text("UpNow - Top Headlines")
-            : TextField(
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: "Search news...",
-                  border: InputBorder.none,
-                ),
-                onChanged: _searchNews,
-              ),
+        title: const Text("UpNow - Top Headlines"),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(searchQuery.isEmpty ? Icons.search : Icons.close),
-            onPressed: () {
-              setState(() {
-                if (searchQuery.isEmpty) {
-                  searchQuery = " ";
-                } else {
-                  searchQuery = "";
-                  filteredArticles = articles;
-                }
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
-            onPressed: () {
-              setState(() => isDark = !isDark);
-              widget.onThemeChanged?.call(isDark); // ✅ toggle theme
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -185,60 +129,51 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: loading
                 ? const Center(child: CircularProgressIndicator())
-                : filteredArticles.isEmpty
-                    ? const Center(child: Text("No news found"))
-                    : RefreshIndicator(
-                        onRefresh: fetchNews,
-                        child: ListView.builder(
-                          itemCount: filteredArticles.length,
-                          itemBuilder: (_, i) {
-                            final article = filteredArticles[i];
-                            return Card(
-                              margin: const EdgeInsets.all(8),
-                              child: ListTile(
-                                leading: article['urlToImage'] != null
-                                    ? FadeInImage.assetNetwork(
-                                        placeholder: 'assets/placeholder.png',
-                                        image: article['urlToImage'],
-                                        width: 80,
-                                        fit: BoxFit.cover,
-                                        imageErrorBuilder:
-                                            (context, error, stackTrace) =>
-                                                const Icon(
-                                          Icons.broken_image,
-                                          size: 50,
-                                          color: Colors.grey,
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.image_not_supported,
-                                        size: 50,
-                                        color: Colors.grey,
-                                      ),
-                                title: Text(
-                                  article['title'] ?? "No Title",
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                subtitle: Text(
-                                  article['description'] ?? "No Description",
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          NewsDetailScreen(article: article),
+                : RefreshIndicator(
+                    onRefresh: fetchNews,
+                    child: ListView.builder(
+                      itemCount: articles.length,
+                      itemBuilder: (_, i) {
+                        final article = articles[i];
+                        return Card(
+                          margin: const EdgeInsets.all(8),
+                          child: ListTile(
+                            leading: article['urlToImage'] != null
+                                ? FadeInImage.assetNetwork(
+                                    placeholder: 'assets/placeholder.png',
+                                    image: article['urlToImage'],
+                                    width: 80,
+                                    fit: BoxFit.cover,
+                                    imageErrorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(
+                                      Icons.broken_image,
+                                      size: 50,
+                                      color: Colors.grey,
                                     ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                                  )
+                                : const Icon(
+                                    Icons.image_not_supported,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
+                            title: Text(
+                              article['title'] ?? "No Title",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              article['description'] ?? "No Description",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            // ✅ Yaha se _openUrl use ho raha hai
+                            onTap: () => _openUrl(article['url']),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
