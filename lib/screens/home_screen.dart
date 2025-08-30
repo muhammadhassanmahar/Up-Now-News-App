@@ -5,7 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(bool)? onThemeChanged; // 🔥 Theme toggle callback
+
+  const HomeScreen({super.key, this.onThemeChanged});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -84,6 +86,17 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text("UpNow - Top Headlines"),
         centerTitle: true,
+        actions: [
+          // 🔥 Theme toggle switch
+          Switch(
+            value: Theme.of(context).brightness == Brightness.dark,
+            onChanged: (val) {
+              if (widget.onThemeChanged != null) {
+                widget.onThemeChanged!(val);
+              }
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -107,7 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue : Colors.grey[300],
+                      color: isSelected
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[300],
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Center(
@@ -167,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            // ✅ Yaha se _openUrl use ho raha hai
                             onTap: () => _openUrl(article['url']),
                           ),
                         );
