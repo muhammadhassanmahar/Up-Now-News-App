@@ -3,12 +3,16 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/splash_screen.dart';
 
 Future<void> main() async {
+  // ✅ Required for async calls before runApp
+  WidgetsFlutterBinding.ensureInitialized();
+
   // ✅ Load env variables
   await dotenv.load(fileName: ".env");
+
   runApp(const UpNowApp()); // ✅ Updated name
 }
 
-class UpNowApp extends StatefulWidget { // ✅ Changed from MyApp -> UpNowApp
+class UpNowApp extends StatefulWidget {
   const UpNowApp({super.key});
 
   @override
@@ -25,6 +29,7 @@ class _UpNowAppState extends State<UpNowApp> {
       title: "UpNow News",
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
+        useMaterial3: true, // ✅ Modern design
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
@@ -34,6 +39,7 @@ class _UpNowAppState extends State<UpNowApp> {
         ),
       ),
       darkTheme: ThemeData(
+        useMaterial3: true, // ✅ Modern design
         primarySwatch: Colors.blue,
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.black,
